@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.master.protos";
+//option java_outer_classname = "StreamProto";
+
+package stream;
+
+service Replication {
+
+  rpc GetNodeIpsForReplication (NodeIpsRequest) returns (NodeIpsReply) {}
+  rpc UpdateReplicationStatus (ReplicationDetailsRequest) returns (ReplicationDetailsResponse) {}
+}
+
+// The request message containing the user's name.
+message NodeIpsRequest {
+  string filename = 1;
+}
+
+// The response message containing the greetings
+message NodeIpsReply {
+  repeated string nodeips = 1;
+}
+
+// The request message containing the user's name.
+message ReplicationDetailsRequest {
+  string filename = 1;
+  repeated string nodeips = 2;
+}
+
+// The response message containing the greetings
+message ReplicationDetailsResponse {
+//  TODO if status of success or failure is needed, then consider adding
+//  repeated string nodeips = 1;
+}

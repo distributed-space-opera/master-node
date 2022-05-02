@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.gateway.protos";
+//option java_outer_classname = "StreamProto";
+
+package stream;
+
+service Authenticate {
+
+  rpc Register (Request) returns (Reply) {}
+
+}
+
+// The request message containing the user's name.
+message Request {
+  string name = 1;
+  string password = 2;
+}
+
+// The response message containing the greetings
+message Reply {
+  string masterip = 1;
+}

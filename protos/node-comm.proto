@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.node.protos";
+//option java_outer_classname = "StreamProto";
+
+package stream;
+
+service NodeReplication {
+
+  rpc CreateReplica (stream CreateReplicaRequest) returns (CreateReplicaReply) {}
+}
+
+// The request message containing the user's name.
+message CreateReplicaRequest {
+  //  TODO add auth jwt token
+  string filename = 1;
+  bytes payload = 2;
+}
+
+// The response message containing the greetings
+message CreateReplicaReply {
+  string status = 1;
+}

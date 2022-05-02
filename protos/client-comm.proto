@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.client.protos";
+//option java_outer_classname = "StreamProto";
+
+package stream;
+
+service Streaming {
+
+  rpc UploadFile (stream UploadFileRequest) returns (UploadFileReply) {}
+  rpc DownloadFile (DownloadFileRequest) returns (stream DownloadFileReply) {}
+}
+
+// The request message containing the user's name.
+message UploadFileRequest {
+  //  TODO add auth jwt token
+  string filename = 1;
+  bytes payload = 2;
+}
+
+// The response message containing the greetings
+message UploadFileReply {
+  string status = 1;
+}
+
+message DownloadFileRequest {
+  //  TODO add auth jwt token
+  string filename = 1;
+}
+
+// The response message containing the greetings
+message DownloadFileReply {
+  bytes payload = 2;
+}
+
