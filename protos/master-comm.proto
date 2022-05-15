@@ -7,9 +7,25 @@ option java_package = "org.master.protos";
 package stream;
 
 service Replication {
+  // Methods required for Gateway
+  rpc NewNodeUpdate(NewNodeUpdateRequest) returns (StatusResponse) {}
+  rpc GetNodeForDownload(GetNodeForDownloadRequest) returns (GetNodeForDownloadResponse) {}
+  rpc GetNodeForUpload(GetNodeForUploadRequest) returns (GetNodeForUploadResponse) {}
 
+  // Methods required for Sentinel
+  rpc NodeDownUpdate(NodeDownUpdateRequest) returns (StatusResponse) {}
+
+  // Methods required for Node
   rpc GetNodeIpsForReplication (NodeIpsRequest) returns (NodeIpsReply) {}
   rpc UpdateReplicationStatus (ReplicationDetailsRequest) returns (ReplicationDetailsResponse) {}
+
+  // Methods required for CLI
+  rpc GetListOfFiles (GetListOfFilesRequest) returns (GetListOfFilesResponse) {}
+}
+
+enum Status {
+  SUCCESS = 0;
+  FAILURE = 1;
 }
 
 // The request message containing the user's name.
@@ -32,4 +48,44 @@ message ReplicationDetailsRequest {
 message ReplicationDetailsResponse {
 //  TODO if status of success or failure is needed, then consider adding
 //  repeated string nodeips = 1;
+  Status status = 1;
+}
+
+// The request message containing the IP address of the new Node that joined the network
+message NewNodeUpdateRequest {
+  string newnodeip = 1;
+}
+
+// The response message containing the generic status of an incoming request
+message StatusResponse {
+  Status status = 1;
+}
+
+message GetNodeForDownloadRequest {
+  string filename = 1;
+}
+
+message GetNodeForDownloadResponse {
+  string nodeip = 1;
+}
+
+message GetNodeForUploadRequest {
+  string filename = 1;
+  int64 filesize = 2; // in bytes
+}
+
+message GetNodeForUploadResponse {
+  string nodeip = 1;
+}
+
+message NodeDownUpdateRequest {
+  string nodeip = 1;
+}
+
+message GetListOfFilesRequest {
+  repeated string nodeips = 1;  // Send empty string to request list of files from all nodes
+}
+
+message GetListOfFilesResponse {
+  repeated string filenames = 1;
 }

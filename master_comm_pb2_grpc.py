@@ -14,6 +14,26 @@ class ReplicationStub(object):
         Args:
             channel: A grpc.Channel.
         """
+        self.NewNodeUpdate = channel.unary_unary(
+                '/stream.Replication/NewNodeUpdate',
+                request_serializer=master__comm__pb2.NewNodeUpdateRequest.SerializeToString,
+                response_deserializer=master__comm__pb2.StatusResponse.FromString,
+                )
+        self.GetNodeForDownload = channel.unary_unary(
+                '/stream.Replication/GetNodeForDownload',
+                request_serializer=master__comm__pb2.GetNodeForDownloadRequest.SerializeToString,
+                response_deserializer=master__comm__pb2.GetNodeForDownloadResponse.FromString,
+                )
+        self.GetNodeForUpload = channel.unary_unary(
+                '/stream.Replication/GetNodeForUpload',
+                request_serializer=master__comm__pb2.GetNodeForUploadRequest.SerializeToString,
+                response_deserializer=master__comm__pb2.GetNodeForUploadResponse.FromString,
+                )
+        self.NodeDownUpdate = channel.unary_unary(
+                '/stream.Replication/NodeDownUpdate',
+                request_serializer=master__comm__pb2.NodeDownUpdateRequest.SerializeToString,
+                response_deserializer=master__comm__pb2.StatusResponse.FromString,
+                )
         self.GetNodeIpsForReplication = channel.unary_unary(
                 '/stream.Replication/GetNodeIpsForReplication',
                 request_serializer=master__comm__pb2.NodeIpsRequest.SerializeToString,
@@ -24,13 +44,45 @@ class ReplicationStub(object):
                 request_serializer=master__comm__pb2.ReplicationDetailsRequest.SerializeToString,
                 response_deserializer=master__comm__pb2.ReplicationDetailsResponse.FromString,
                 )
+        self.GetListOfFiles = channel.unary_unary(
+                '/stream.Replication/GetListOfFiles',
+                request_serializer=master__comm__pb2.GetListOfFilesRequest.SerializeToString,
+                response_deserializer=master__comm__pb2.GetListOfFilesResponse.FromString,
+                )
 
 
 class ReplicationServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def GetNodeIpsForReplication(self, request, context):
+    def NewNodeUpdate(self, request, context):
+        """Methods required for Gateway
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetNodeForDownload(self, request, context):
         """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetNodeForUpload(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def NodeDownUpdate(self, request, context):
+        """Methods required for Sentinel
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetNodeIpsForReplication(self, request, context):
+        """Methods required for Node
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
@@ -41,9 +93,36 @@ class ReplicationServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetListOfFiles(self, request, context):
+        """Methods required for CLI
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_ReplicationServicer_to_server(servicer, server):
     rpc_method_handlers = {
+            'NewNodeUpdate': grpc.unary_unary_rpc_method_handler(
+                    servicer.NewNodeUpdate,
+                    request_deserializer=master__comm__pb2.NewNodeUpdateRequest.FromString,
+                    response_serializer=master__comm__pb2.StatusResponse.SerializeToString,
+            ),
+            'GetNodeForDownload': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetNodeForDownload,
+                    request_deserializer=master__comm__pb2.GetNodeForDownloadRequest.FromString,
+                    response_serializer=master__comm__pb2.GetNodeForDownloadResponse.SerializeToString,
+            ),
+            'GetNodeForUpload': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetNodeForUpload,
+                    request_deserializer=master__comm__pb2.GetNodeForUploadRequest.FromString,
+                    response_serializer=master__comm__pb2.GetNodeForUploadResponse.SerializeToString,
+            ),
+            'NodeDownUpdate': grpc.unary_unary_rpc_method_handler(
+                    servicer.NodeDownUpdate,
+                    request_deserializer=master__comm__pb2.NodeDownUpdateRequest.FromString,
+                    response_serializer=master__comm__pb2.StatusResponse.SerializeToString,
+            ),
             'GetNodeIpsForReplication': grpc.unary_unary_rpc_method_handler(
                     servicer.GetNodeIpsForReplication,
                     request_deserializer=master__comm__pb2.NodeIpsRequest.FromString,
@@ -54,6 +133,11 @@ def add_ReplicationServicer_to_server(servicer, server):
                     request_deserializer=master__comm__pb2.ReplicationDetailsRequest.FromString,
                     response_serializer=master__comm__pb2.ReplicationDetailsResponse.SerializeToString,
             ),
+            'GetListOfFiles': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetListOfFiles,
+                    request_deserializer=master__comm__pb2.GetListOfFilesRequest.FromString,
+                    response_serializer=master__comm__pb2.GetListOfFilesResponse.SerializeToString,
+            ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
             'stream.Replication', rpc_method_handlers)
@@ -63,6 +147,74 @@ def add_ReplicationServicer_to_server(servicer, server):
  # This class is part of an EXPERIMENTAL API.
 class Replication(object):
     """Missing associated documentation comment in .proto file."""
+
+    @staticmethod
+    def NewNodeUpdate(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/stream.Replication/NewNodeUpdate',
+            master__comm__pb2.NewNodeUpdateRequest.SerializeToString,
+            master__comm__pb2.StatusResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetNodeForDownload(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/stream.Replication/GetNodeForDownload',
+            master__comm__pb2.GetNodeForDownloadRequest.SerializeToString,
+            master__comm__pb2.GetNodeForDownloadResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetNodeForUpload(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/stream.Replication/GetNodeForUpload',
+            master__comm__pb2.GetNodeForUploadRequest.SerializeToString,
+            master__comm__pb2.GetNodeForUploadResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def NodeDownUpdate(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/stream.Replication/NodeDownUpdate',
+            master__comm__pb2.NodeDownUpdateRequest.SerializeToString,
+            master__comm__pb2.StatusResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
     def GetNodeIpsForReplication(request,
@@ -95,5 +247,22 @@ class Replication(object):
         return grpc.experimental.unary_unary(request, target, '/stream.Replication/UpdateReplicationStatus',
             master__comm__pb2.ReplicationDetailsRequest.SerializeToString,
             master__comm__pb2.ReplicationDetailsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetListOfFiles(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/stream.Replication/GetListOfFiles',
+            master__comm__pb2.GetListOfFilesRequest.SerializeToString,
+            master__comm__pb2.GetListOfFilesResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
