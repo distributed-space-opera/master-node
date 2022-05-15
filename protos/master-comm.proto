@@ -14,6 +14,7 @@ service Replication {
 
   // Methods required for Sentinel
   rpc NodeDownUpdate(NodeDownUpdateRequest) returns (StatusResponse) {}
+  rpc GetListOfNodes(GetListOfNodesRequest) returns (GetListOfNodesResponse) {}
 
   // Methods required for Node
   rpc GetNodeIpsForReplication (NodeIpsRequest) returns (NodeIpsReply) {}
@@ -83,9 +84,17 @@ message NodeDownUpdateRequest {
 }
 
 message GetListOfFilesRequest {
-  repeated string nodeips = 1;  // Send empty string to request list of files from all nodes
+  repeated string nodeips = 1;  // Send empty request to get list of files from all nodes
 }
 
 message GetListOfFilesResponse {
   repeated string filenames = 1;
+}
+
+message GetListOfNodesRequest {
+  // Empty body
+}
+
+message GetListOfNodesResponse {
+  repeated string nodeips = 1;
 }

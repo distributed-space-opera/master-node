@@ -34,6 +34,11 @@ class ReplicationStub(object):
                 request_serializer=master__comm__pb2.NodeDownUpdateRequest.SerializeToString,
                 response_deserializer=master__comm__pb2.StatusResponse.FromString,
                 )
+        self.GetListOfNodes = channel.unary_unary(
+                '/stream.Replication/GetListOfNodes',
+                request_serializer=master__comm__pb2.GetListOfNodesRequest.SerializeToString,
+                response_deserializer=master__comm__pb2.GetListOfNodesResponse.FromString,
+                )
         self.GetNodeIpsForReplication = channel.unary_unary(
                 '/stream.Replication/GetNodeIpsForReplication',
                 request_serializer=master__comm__pb2.NodeIpsRequest.SerializeToString,
@@ -80,6 +85,12 @@ class ReplicationServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetListOfNodes(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def GetNodeIpsForReplication(self, request, context):
         """Methods required for Node
         """
@@ -122,6 +133,11 @@ def add_ReplicationServicer_to_server(servicer, server):
                     servicer.NodeDownUpdate,
                     request_deserializer=master__comm__pb2.NodeDownUpdateRequest.FromString,
                     response_serializer=master__comm__pb2.StatusResponse.SerializeToString,
+            ),
+            'GetListOfNodes': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetListOfNodes,
+                    request_deserializer=master__comm__pb2.GetListOfNodesRequest.FromString,
+                    response_serializer=master__comm__pb2.GetListOfNodesResponse.SerializeToString,
             ),
             'GetNodeIpsForReplication': grpc.unary_unary_rpc_method_handler(
                     servicer.GetNodeIpsForReplication,
@@ -213,6 +229,23 @@ class Replication(object):
         return grpc.experimental.unary_unary(request, target, '/stream.Replication/NodeDownUpdate',
             master__comm__pb2.NodeDownUpdateRequest.SerializeToString,
             master__comm__pb2.StatusResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetListOfNodes(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/stream.Replication/GetListOfNodes',
+            master__comm__pb2.GetListOfNodesRequest.SerializeToString,
+            master__comm__pb2.GetListOfNodesResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
