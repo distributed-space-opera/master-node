@@ -6,9 +6,15 @@ import master_comm_pb2
 import master_comm_pb2_grpc
 import redis
 
+# Redis configuration
 REDIS_HOST = "localhost"
 REDIS_PORT = 6379
 REDIS_PASSWORD = ""
+
+# Redis keys
+NETWORK_NODES = "network:nodes"
+NETWORK_NODE_DATA = "network:data:node:%s"
+NETWORK_DATA = "network:data:file:%s"
 
 # Absl flags
 FLAGS = flags.FLAGS
@@ -18,21 +24,24 @@ flags.DEFINE_integer('redis_port', REDIS_PORT, 'Redis port')
 flags.DEFINE_string('redis_password', REDIS_PASSWORD, 'Redis password')
 
 
-# Setup redis client that will store all network node and file information
+# Redis client that will store all network node and file information
 redis_client = None
-try:
-    redis_client = redis.Redis(host=FLAGS.redis_host, port=FLAGS.redis_port, password=FLAGS.redis_password, decode_responses=True)
-except Exception as e:
-    logging.error("Error while connecting to redis: %s", e)
-    exit(1)
 
 
 class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
     # Functions for Gateway
     def NewNodeUpdate(self, request, context):
-        return master_comm_pb2.StatusResponse(master_comm_pb2.SUCCESS)
+        logging.info(f"NewNodeUpdate invoked with request: {request}")
+        if request.newnodeip:
+            # Save new node to Redis DB
+            redis_client.sadd(NETWORK_NODES, request.newnodeip)
+            return master_comm_pb2.StatusResponse(master_comm_pb2.SUCCESS)
+        else:
+            logging.error("NewNodeUpdate invoked with empty request")
+            return master_comm_pb2.StatusResponse(master_comm_pb2.FAILURE)
 
     def GetNodeForDownload(self, request, context):
+        logging.info(f"GetNodeForDownload invoked with request: {request}")
         return master_comm_pb2.GetNodeForDownloadResponse(nodeip="test0")
 
     def GetNodeForUpload(self, request, context):
@@ -51,7 +60,8 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
 
     # Functions for CLI
     def GetListOfFiles(self, request, context):
-        return master_comm_pb2.GetListOfFilesResponse(files=["file0", "file1"])
+        logging.info(f"GetListOfFiles invoked with request: {request}")
+        return master_comm_pb2.GetListOfFilesResponse(filenames=["file0", "file1"])
 
 
 def serve():
@@ -62,7 +72,21 @@ def serve():
     server.wait_for_termination()
 
 
+def setup_redis():
+    """
+    Setup Redis client
+    """
+    global redis_client
+    try:
+        redis_client = redis.Redis(host=FLAGS.redis_host, port=FLAGS.redis_port, password=FLAGS.redis_password, decode_responses=True)
+    except Exception as e:
+        logging.error("Error while connecting to redis: %s", e)
+        exit(1)
+
+
 def main(argv):
+    logging.info("Setting up redis client...")
+    setup_redis()
     logging.info("Starting gRPC server...")
     serve()
 
