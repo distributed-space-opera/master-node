@@ -28,11 +28,30 @@ except Exception as e:
 
 
 class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
+    # Functions for Gateway
+    def NewNodeUpdate(self, request, context):
+        return master_comm_pb2.StatusResponse(master_comm_pb2.SUCCESS)
+
+    def GetNodeForDownload(self, request, context):
+        return master_comm_pb2.GetNodeForDownloadResponse(nodeip="test0")
+
+    def GetNodeForUpload(self, request, context):
+        return master_comm_pb2.GetNodeForUploadResponse(nodeip="test0")
+
+    # Functions for Sentinel
+    def NodeDownUpdate(self, request, context):
+        return master_comm_pb2.StatusResponse(master_comm_pb2.SUCCESS)
+
+    # Functions for Node
     def GetNodeIpsForReplication(self, request, context):
         return master_comm_pb2.NodeIpsReply(nodeips=["test0", "test1"])
 
     def UpdateReplicationStatus(self, request, context):
         return master_comm_pb2.ReplicationDetailsResponse()
+
+    # Functions for CLI
+    def GetListOfFiles(self, request, context):
+        return master_comm_pb2.GetListOfFilesResponse(files=["file0", "file1"])
 
 
 def serve():
