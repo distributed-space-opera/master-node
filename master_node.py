@@ -67,6 +67,11 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
     def NodeDownUpdate(self, request, context):
         return master_comm_pb2.StatusResponse(master_comm_pb2.SUCCESS)
 
+    def GetListOfNodes(self, request, context):
+        logging.info(f"GetListOfNodes invoked with request: {request}")
+        nodes = redis_client.smembers(NETWORK_NODES)
+        return master_comm_pb2.GetListOfNodesResponse(nodes=list(nodes))
+
     # Functions for Node
     def GetNodeIpsForReplication(self, request, context):
         return master_comm_pb2.NodeIpsReply(nodeips=["test0", "test1"])
