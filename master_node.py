@@ -4,6 +4,7 @@ from concurrent import futures
 import grpc
 import master_comm_pb2
 import master_comm_pb2_grpc
+import random
 import redis
 
 # Redis configuration
@@ -13,8 +14,12 @@ REDIS_PASSWORD = ""
 
 # Redis keys
 NETWORK_NODES = "network:nodes"
+NETWORK_DATA = "network:data"
 NETWORK_NODE_DATA = "network:data:node:%s"
-NETWORK_DATA = "network:data:file:%s"
+NETWORK_DATA_FILE = "network:data:file:%s"
+
+# Constants
+REPLICATION_FACTOR  = 3
 
 # Absl flags
 FLAGS = flags.FLAGS
@@ -22,6 +27,7 @@ FLAGS = flags.FLAGS
 flags.DEFINE_string('redis_host', REDIS_HOST, 'Redis host')
 flags.DEFINE_integer('redis_port', REDIS_PORT, 'Redis port')
 flags.DEFINE_string('redis_password', REDIS_PASSWORD, 'Redis password')
+flags.DEFINE_integer('replication_factor', REPLICATION_FACTOR, 'Replication factor for Space Opera network')
 
 
 # Redis client that will store all network node and file information
@@ -42,7 +48,17 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
 
     def GetNodeForDownload(self, request, context):
         logging.info(f"GetNodeForDownload invoked with request: {request}")
-        return master_comm_pb2.GetNodeForDownloadResponse(nodeip="test0")
+        if request.filename:
+            nodes = redis_client.smembers(NETWORK_DATA_FILE % request.filename)
+            if nodes:
+                # Return random node that contains the file
+                node = random.choice(list(nodes))
+                return master_comm_pb2.GetNodeForDownloadResponse(nodeip=node)
+            else:
+                return master_comm_pb2.GetNodeForDownloadResponse(nodeip="")
+        else:
+            logging.error("GetNodeForDownload invoked with empty request")
+            return master_comm_pb2.GetNodeForDownloadResponse(nodeip="")
 
     def GetNodeForUpload(self, request, context):
         return master_comm_pb2.GetNodeForUploadResponse(nodeip="test0")
@@ -61,7 +77,19 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
     # Functions for CLI
     def GetListOfFiles(self, request, context):
         logging.info(f"GetListOfFiles invoked with request: {request}")
-        return master_comm_pb2.GetListOfFilesResponse(filenames=["file0", "file1"])
+        if request.nodeips:
+            files = set()
+            for node in request.nodeips:
+                # Get list of files on node
+                node_files = redis_client.smembers(NETWORK_NODE_DATA % node)
+                files.update(node_files)
+
+            return master_comm_pb2.GetListOfFilesResponse(files=list(files))
+        else:
+            # Return list of all files on the network
+            files = redis_client.smembers(NETWORK_DATA)
+            return master_comm_pb2.GetListOfFilesResponse(filenames = list(files))
+        return master_comm_pb2.GetListOfFilesResponse()
 
 
 def serve():
