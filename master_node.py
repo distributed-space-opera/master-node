@@ -1,3 +1,4 @@
+import re
 from absl import app, flags, logging
 from concurrent import futures
 
@@ -61,7 +62,21 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
             return master_comm_pb2.GetNodeForDownloadResponse(nodeip="")
 
     def GetNodeForUpload(self, request, context):
-        return master_comm_pb2.GetNodeForUploadResponse(nodeip="test0")
+        logging.info(f"GetNodeForUpload invoked with request: {request}")
+        if request.filename:
+            # Build mapping of nodes to number of files stored on them
+            nodes = {}
+            for node in redis_client.smembers(NETWORK_NODES):
+                nodes[node] = len(redis_client.smembers(NETWORK_NODE_DATA % node))
+
+            # Sort nodes by number of files stored on them
+            sorted_nodes = sorted(nodes.items(), key=lambda x: x[1])
+
+            # Return node with least number of files
+            return master_comm_pb2.GetNodeForUploadResponse(nodeip=sorted_nodes[0][0])
+        else:
+            logging.error("GetNodeForUpload invoked with empty request")
+            return master_comm_pb2.GetNodeForUploadResponse()
 
     # Functions for Sentinel
     def NodeDownUpdate(self, request, context):
