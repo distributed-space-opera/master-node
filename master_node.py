@@ -85,14 +85,23 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
     def GetListOfNodes(self, request, context):
         logging.info(f"GetListOfNodes invoked with request: {request}")
         nodes = redis_client.smembers(NETWORK_NODES)
-        return master_comm_pb2.GetListOfNodesResponse(nodes=list(nodes))
+        return master_comm_pb2.GetListOfNodesResponse(nodeips=list(nodes))
 
     # Functions for Node
     def GetNodeIpsForReplication(self, request, context):
         return master_comm_pb2.NodeIpsReply(nodeips=["test0", "test1"])
 
     def UpdateReplicationStatus(self, request, context):
-        return master_comm_pb2.ReplicationDetailsResponse()
+        logging.info(f"UpdateReplicationStatus invoked with request: {request}")
+        if request.filename and request.nodeips:
+            for node in request.nodeips:
+                # Add file to node
+                redis_client.sadd(NETWORK_NODE_DATA % node, request.filename)
+                # Add node to file
+                redis_client.sadd(NETWORK_DATA_FILE % request.filename, node)
+            return master_comm_pb2.StatusResponse(master_comm_pb2.SUCCESS)
+        else:
+            return master_comm_pb2.ReplicationDetailsResponse(master_comm_pb2.FAILURE)
 
     # Functions for CLI
     def GetListOfFiles(self, request, context):
