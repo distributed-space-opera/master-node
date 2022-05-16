@@ -42,10 +42,10 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
         if request.newnodeip:
             # Save new node to Redis DB
             redis_client.sadd(NETWORK_NODES, request.newnodeip)
-            return master_comm_pb2.StatusResponse(master_comm_pb2.SUCCESS)
+            return master_comm_pb2.StatusResponse(status = master_comm_pb2.Status.Value("SUCCESS"))
         else:
             logging.error("NewNodeUpdate invoked with empty request")
-            return master_comm_pb2.StatusResponse(master_comm_pb2.FAILURE)
+            return master_comm_pb2.StatusResponse(status = master_comm_pb2.Status.Value("FAILURE"))
 
     def GetNodeForDownload(self, request, context):
         logging.info(f"GetNodeForDownload invoked with request: {request}")
@@ -56,10 +56,10 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
                 node = random.choice(list(nodes))
                 return master_comm_pb2.GetNodeForDownloadResponse(nodeip=node)
             else:
-                return master_comm_pb2.GetNodeForDownloadResponse(nodeip="")
+                return master_comm_pb2.GetNodeForDownloadResponse()
         else:
             logging.error("GetNodeForDownload invoked with empty request")
-            return master_comm_pb2.GetNodeForDownloadResponse(nodeip="")
+            return master_comm_pb2.GetNodeForDownloadResponse()
 
     def GetNodeForUpload(self, request, context):
         logging.info(f"GetNodeForUpload invoked with request: {request}")
@@ -72,15 +72,21 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
             # Sort nodes by number of files stored on them
             sorted_nodes = sorted(nodes.items(), key=lambda x: x[1])
 
-            # Return node with least number of files
-            return master_comm_pb2.GetNodeForUploadResponse(nodeip=sorted_nodes[0][0])
+            # Node with least number of files
+            node_ip = sorted_nodes[0][0]
+
+            redis_client.sadd(NETWORK_DATA, request.filename)
+            redis_client.sadd(NETWORK_NODE_DATA % node_ip, request.filename)
+            redis_client.sadd(NETWORK_DATA_FILE % request.filename, node_ip)
+
+            return master_comm_pb2.GetNodeForUploadResponse(nodeip = node_ip)
         else:
             logging.error("GetNodeForUpload invoked with empty request")
             return master_comm_pb2.GetNodeForUploadResponse()
 
     # Functions for Sentinel
     def NodeDownUpdate(self, request, context):
-        return master_comm_pb2.StatusResponse(master_comm_pb2.SUCCESS)
+        return master_comm_pb2.StatusResponse(status = master_comm_pb2.Status.Value("SUCCESS"))
 
     def GetListOfNodes(self, request, context):
         logging.info(f"GetListOfNodes invoked with request: {request}")
@@ -89,7 +95,30 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
 
     # Functions for Node
     def GetNodeIpsForReplication(self, request, context):
-        return master_comm_pb2.NodeIpsReply(nodeips=["test0", "test1"])
+        if request.filename:
+            # Get list of nodes that don't have the file
+            new_nodes = redis_client.sdiff(NETWORK_NODES, NETWORK_DATA_FILE % request.filename)
+
+            # Build map of number of files per node
+            nodes = {}
+            for node in new_nodes:
+                nodes[node] = len(redis_client.smembers(NETWORK_NODE_DATA % node))
+
+            # Sort nodes by number of files stored on them
+            sorted_nodes = sorted(nodes.items(), key=lambda x: x[1])
+
+            replication_nodes = []
+            count = 0
+            for node in sorted_nodes:
+                replication_nodes.append(node[0])
+                count += 1
+                if count == FLAGS.replication_factor - 1:
+                    break
+            
+            # Return list of nodes to replicate
+            return master_comm_pb2.NodeIpsReply(nodeips = replication_nodes)
+        else:
+            return master_comm_pb2.NodeIpsReply()
 
     def UpdateReplicationStatus(self, request, context):
         logging.info(f"UpdateReplicationStatus invoked with request: {request}")
@@ -99,9 +128,9 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
                 redis_client.sadd(NETWORK_NODE_DATA % node, request.filename)
                 # Add node to file
                 redis_client.sadd(NETWORK_DATA_FILE % request.filename, node)
-            return master_comm_pb2.StatusResponse(master_comm_pb2.SUCCESS)
+            return master_comm_pb2.StatusResponse(status = master_comm_pb2.Status.Value("SUCCESS"))
         else:
-            return master_comm_pb2.ReplicationDetailsResponse(master_comm_pb2.FAILURE)
+            return master_comm_pb2.StatusResponse(status = master_comm_pb2.Status.Value("FAILURE"))
 
     # Functions for CLI
     def GetListOfFiles(self, request, context):
