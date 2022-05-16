@@ -118,6 +118,8 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
                 # TODO: Send message to node to replicate file to replica_node
                 logging.info(f"Replicating file {file} to {replica_node}")
                 # TODO
+                # Get a node that has the required file
+                # Send message to node to replicate file to replica_node
 
             # Remove node from network
             redis_client.srem(NETWORK_NODES, request.nodeip)
