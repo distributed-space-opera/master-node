@@ -1,3 +1,7 @@
+"""
+Master Node implementation in Python3 for Space Opera
+"""
+
 from absl import app, flags, logging
 from concurrent import futures
 
@@ -37,6 +41,10 @@ redis_client = None
 class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
     # Functions for Gateway
     def NewNodeUpdate(self, request, context):
+        """
+        NewNodeUpdate is invoked when a new node joins the network
+        Invoked by Gateway
+        """
         logging.info(f"NewNodeUpdate invoked with request: {request}")
         if request.newnodeip:
             # Save new node to Redis DB
@@ -46,7 +54,12 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
             logging.error("NewNodeUpdate invoked with empty request")
             return master_comm_pb2.StatusResponse(status = master_comm_pb2.Status.Value("FAILURE"))
 
+
     def GetNodeForDownload(self, request, context):
+        """
+        GetNodeForDownload is invoked when a client wants to download a file
+        Invoked by Gateway
+        """
         logging.info(f"GetNodeForDownload invoked with request: {request}")
         if request.filename:
             nodes = redis_client.smembers(NETWORK_DATA_FILE % request.filename)
@@ -60,7 +73,12 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
             logging.error("GetNodeForDownload invoked with empty request")
             return master_comm_pb2.GetNodeForDownloadResponse()
 
+
     def GetNodeForUpload(self, request, context):
+        """
+        GetNodeForUpload is invoked when a client wants to upload a file
+        Invoked by Gateway
+        """
         logging.info(f"GetNodeForUpload invoked with request: {request}")
         if request.filename:
             # Build mapping of nodes to number of files stored on them
@@ -83,8 +101,13 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
             logging.error("GetNodeForUpload invoked with empty request")
             return master_comm_pb2.GetNodeForUploadResponse()
 
+
     # Functions for Sentinel
     def NodeDownUpdate(self, request, context):
+        """
+        NodeDownUpdate is invoked when a node is unresponsive as detected by the Sentinel
+        Invoked by Sentinel
+        """
         logging.info(f"NodeDownUpdate invoked with request: {request}")
         if request.nodeip:
             # Replicate all the files stored on the node
@@ -103,13 +126,23 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
             logging.error("NodeDownUpdate invoked with empty request")
             return master_comm_pb2.StatusResponse(status = master_comm_pb2.Status.Value("FAILURE"))
 
+
     def GetListOfNodes(self, request, context):
+        """
+        GetListOfNodes is invoked when the Sentinel wants to know the list of nodes in the network
+        Invoked by Sentinel
+        """
         logging.info(f"GetListOfNodes invoked with request: {request}")
         nodes = redis_client.smembers(NETWORK_NODES)
         return master_comm_pb2.GetListOfNodesResponse(nodeips=list(nodes))
 
+
     # Functions for Node
     def GetNodeIpsForReplication(self, request, context):
+        """
+        GetNodeIpsForReplication is invoked when a file has been uploaded to the Node and needs to be replicated
+        Invoked by Node
+        """
         logging.info(f"GetNodeIpsForReplication invoked with request: {request}")
         if request.filename:
             # Get list of nodes that don't have the file
@@ -137,7 +170,12 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
             logging.error("GetNodeIpsForReplication invoked with empty request")
             return master_comm_pb2.NodeIpsReply()
 
+
     def UpdateReplicationStatus(self, request, context):
+        """
+        UpdateReplicationStatus is invoked when a node has finished replicating a file to all the nodes
+        Invoked by Node
+        """
         logging.info(f"UpdateReplicationStatus invoked with request: {request}")
         if request.filename and request.nodeips:
             for node in request.nodeips:
@@ -150,8 +188,13 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
             logging.error("UpdateReplicationStatus invoked with empty request")
             return master_comm_pb2.StatusResponse(status = master_comm_pb2.Status.Value("FAILURE"))
 
+
     # Functions for CLI
     def GetListOfFiles(self, request, context):
+        """
+        GetListOfFiles is invoked when the CLI wants to know the list of files in the network
+        Invoked by CLI
+        """
         logging.info(f"GetListOfFiles invoked with request: {request}")
         if request.nodeips:
             files = set()
