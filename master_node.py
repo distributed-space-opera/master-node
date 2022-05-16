@@ -1,4 +1,3 @@
-import re
 from absl import app, flags, logging
 from concurrent import futures
 
@@ -86,7 +85,23 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
 
     # Functions for Sentinel
     def NodeDownUpdate(self, request, context):
-        return master_comm_pb2.StatusResponse(status = master_comm_pb2.Status.Value("SUCCESS"))
+        logging.info(f"NodeDownUpdate invoked with request: {request}")
+        if request.nodeip:
+            # Replicate all the files stored on the node
+            files = redis_client.smembers(NETWORK_NODE_DATA % request.nodeip)
+            for file in files:
+                replica_nodes = redis_client.sdiff(NETWORK_NODES, NETWORK_DATA_FILE % file)
+                replica_node = random.choice(list(replica_nodes))
+                # TODO: Send message to node to replicate file to replica_node
+                logging.info(f"Replicating file {file} to {replica_node}")
+                # TODO
+
+            # Remove node from network
+            redis_client.srem(NETWORK_NODES, request.nodeip)
+            return master_comm_pb2.StatusResponse(status = master_comm_pb2.Status.Value("SUCCESS"))            
+        else:
+            logging.error("NodeDownUpdate invoked with empty request")
+            return master_comm_pb2.StatusResponse(status = master_comm_pb2.Status.Value("FAILURE"))
 
     def GetListOfNodes(self, request, context):
         logging.info(f"GetListOfNodes invoked with request: {request}")
@@ -95,6 +110,7 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
 
     # Functions for Node
     def GetNodeIpsForReplication(self, request, context):
+        logging.info(f"GetNodeIpsForReplication invoked with request: {request}")
         if request.filename:
             # Get list of nodes that don't have the file
             new_nodes = redis_client.sdiff(NETWORK_NODES, NETWORK_DATA_FILE % request.filename)
@@ -118,6 +134,7 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
             # Return list of nodes to replicate
             return master_comm_pb2.NodeIpsReply(nodeips = replication_nodes)
         else:
+            logging.error("GetNodeIpsForReplication invoked with empty request")
             return master_comm_pb2.NodeIpsReply()
 
     def UpdateReplicationStatus(self, request, context):
@@ -130,6 +147,7 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
                 redis_client.sadd(NETWORK_DATA_FILE % request.filename, node)
             return master_comm_pb2.StatusResponse(status = master_comm_pb2.Status.Value("SUCCESS"))
         else:
+            logging.error("UpdateReplicationStatus invoked with empty request")
             return master_comm_pb2.StatusResponse(status = master_comm_pb2.Status.Value("FAILURE"))
 
     # Functions for CLI
@@ -147,7 +165,6 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
             # Return list of all files on the network
             files = redis_client.smembers(NETWORK_DATA)
             return master_comm_pb2.GetListOfFilesResponse(filenames = list(files))
-        return master_comm_pb2.GetListOfFilesResponse()
 
 
 def serve():
