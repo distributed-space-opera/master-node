@@ -6,6 +6,9 @@ Master Node implementation for Space Opera in Python
 - `python3 -m grpc_tools.protoc -I./protos --python_out=. --grpc_python_out=. ./protos/*.proto` to generate the client and server stubs from proto files
 - `python3 master_node.py` to run the Master Node
 - `python3 master_node.py --help` to see the available options
+- Install Redis to test locally
+    - For MacOS: `brew install redis`
+- Postman can be used to test the gRPC server locally
 
 ## Team Members
 - Anupriya, Arpitha, Rounak, Sandhya
