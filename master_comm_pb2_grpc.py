@@ -17,7 +17,7 @@ class ReplicationStub(object):
         self.NewNodeUpdate = channel.unary_unary(
                 '/stream.Replication/NewNodeUpdate',
                 request_serializer=master__comm__pb2.NewNodeUpdateRequest.SerializeToString,
-                response_deserializer=master__comm__pb2.StatusResponse.FromString,
+                response_deserializer=master__comm__pb2.NewNodeUpdateResponse.FromString,
                 )
         self.GetNodeForDownload = channel.unary_unary(
                 '/stream.Replication/GetNodeForDownload',
@@ -32,7 +32,7 @@ class ReplicationStub(object):
         self.NodeDownUpdate = channel.unary_unary(
                 '/stream.Replication/NodeDownUpdate',
                 request_serializer=master__comm__pb2.NodeDownUpdateRequest.SerializeToString,
-                response_deserializer=master__comm__pb2.StatusResponse.FromString,
+                response_deserializer=master__comm__pb2.NodeDownUpdateResponse.FromString,
                 )
         self.GetListOfNodes = channel.unary_unary(
                 '/stream.Replication/GetListOfNodes',
@@ -117,7 +117,7 @@ def add_ReplicationServicer_to_server(servicer, server):
             'NewNodeUpdate': grpc.unary_unary_rpc_method_handler(
                     servicer.NewNodeUpdate,
                     request_deserializer=master__comm__pb2.NewNodeUpdateRequest.FromString,
-                    response_serializer=master__comm__pb2.StatusResponse.SerializeToString,
+                    response_serializer=master__comm__pb2.NewNodeUpdateResponse.SerializeToString,
             ),
             'GetNodeForDownload': grpc.unary_unary_rpc_method_handler(
                     servicer.GetNodeForDownload,
@@ -132,7 +132,7 @@ def add_ReplicationServicer_to_server(servicer, server):
             'NodeDownUpdate': grpc.unary_unary_rpc_method_handler(
                     servicer.NodeDownUpdate,
                     request_deserializer=master__comm__pb2.NodeDownUpdateRequest.FromString,
-                    response_serializer=master__comm__pb2.StatusResponse.SerializeToString,
+                    response_serializer=master__comm__pb2.NodeDownUpdateResponse.SerializeToString,
             ),
             'GetListOfNodes': grpc.unary_unary_rpc_method_handler(
                     servicer.GetListOfNodes,
@@ -177,7 +177,7 @@ class Replication(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/stream.Replication/NewNodeUpdate',
             master__comm__pb2.NewNodeUpdateRequest.SerializeToString,
-            master__comm__pb2.StatusResponse.FromString,
+            master__comm__pb2.NewNodeUpdateResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -228,7 +228,7 @@ class Replication(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/stream.Replication/NodeDownUpdate',
             master__comm__pb2.NodeDownUpdateRequest.SerializeToString,
-            master__comm__pb2.StatusResponse.FromString,
+            master__comm__pb2.NodeDownUpdateResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

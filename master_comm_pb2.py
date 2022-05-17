@@ -15,7 +15,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11master-comm.proto\x12\x06stream\"\"\n\x0eNodeIpsRequest\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\"\x1f\n\x0cNodeIpsReply\x12\x0f\n\x07nodeips\x18\x01 \x03(\t\">\n\x19ReplicationDetailsRequest\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x0f\n\x07nodeips\x18\x02 \x03(\t\"<\n\x1aReplicationDetailsResponse\x12\x1e\n\x06status\x18\x01 \x01(\x0e\x32\x0e.stream.Status\")\n\x14NewNodeUpdateRequest\x12\x11\n\tnewnodeip\x18\x01 \x01(\t\"0\n\x0eStatusResponse\x12\x1e\n\x06status\x18\x01 \x01(\x0e\x32\x0e.stream.Status\"-\n\x19GetNodeForDownloadRequest\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\",\n\x1aGetNodeForDownloadResponse\x12\x0e\n\x06nodeip\x18\x01 \x01(\t\"=\n\x17GetNodeForUploadRequest\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x10\n\x08\x66ilesize\x18\x02 \x01(\x03\"*\n\x18GetNodeForUploadResponse\x12\x0e\n\x06nodeip\x18\x01 \x01(\t\"\'\n\x15NodeDownUpdateRequest\x12\x0e\n\x06nodeip\x18\x01 \x01(\t\"(\n\x15GetListOfFilesRequest\x12\x0f\n\x07nodeips\x18\x01 \x03(\t\"+\n\x16GetListOfFilesResponse\x12\x11\n\tfilenames\x18\x01 \x03(\t\"\x17\n\x15GetListOfNodesRequest\")\n\x16GetListOfNodesResponse\x12\x0f\n\x07nodeips\x18\x01 \x03(\t*\"\n\x06Status\x12\x0b\n\x07SUCCESS\x10\x00\x12\x0b\n\x07\x46\x41ILURE\x10\x01\x32\xaf\x05\n\x0bReplication\x12G\n\rNewNodeUpdate\x12\x1c.stream.NewNodeUpdateRequest\x1a\x16.stream.StatusResponse\"\x00\x12]\n\x12GetNodeForDownload\x12!.stream.GetNodeForDownloadRequest\x1a\".stream.GetNodeForDownloadResponse\"\x00\x12W\n\x10GetNodeForUpload\x12\x1f.stream.GetNodeForUploadRequest\x1a .stream.GetNodeForUploadResponse\"\x00\x12I\n\x0eNodeDownUpdate\x12\x1d.stream.NodeDownUpdateRequest\x1a\x16.stream.StatusResponse\"\x00\x12Q\n\x0eGetListOfNodes\x12\x1d.stream.GetListOfNodesRequest\x1a\x1e.stream.GetListOfNodesResponse\"\x00\x12J\n\x18GetNodeIpsForReplication\x12\x16.stream.NodeIpsRequest\x1a\x14.stream.NodeIpsReply\"\x00\x12\x62\n\x17UpdateReplicationStatus\x12!.stream.ReplicationDetailsRequest\x1a\".stream.ReplicationDetailsResponse\"\x00\x12Q\n\x0eGetListOfFiles\x12\x1d.stream.GetListOfFilesRequest\x1a\x1e.stream.GetListOfFilesResponse\"\x00\x42\x15\n\x11org.master.protosP\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11master-comm.proto\x12\x06stream\"\"\n\x0eNodeIpsRequest\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\"\x1f\n\x0cNodeIpsReply\x12\x0f\n\x07nodeips\x18\x01 \x03(\t\">\n\x19ReplicationDetailsRequest\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x0f\n\x07nodeips\x18\x02 \x03(\t\"<\n\x1aReplicationDetailsResponse\x12\x1e\n\x06status\x18\x01 \x01(\x0e\x32\x0e.stream.Status\")\n\x14NewNodeUpdateRequest\x12\x11\n\tnewnodeip\x18\x01 \x01(\t\"\'\n\x15NewNodeUpdateResponse\x12\x0e\n\x06status\x18\x01 \x01(\t\"0\n\x0eStatusResponse\x12\x1e\n\x06status\x18\x01 \x01(\x0e\x32\x0e.stream.Status\"-\n\x19GetNodeForDownloadRequest\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\",\n\x1aGetNodeForDownloadResponse\x12\x0e\n\x06nodeip\x18\x01 \x01(\t\"=\n\x17GetNodeForUploadRequest\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x10\n\x08\x66ilesize\x18\x02 \x01(\x03\"*\n\x18GetNodeForUploadResponse\x12\x0e\n\x06nodeip\x18\x01 \x01(\t\"\'\n\x15NodeDownUpdateRequest\x12\x0e\n\x06nodeip\x18\x01 \x01(\t\"(\n\x16NodeDownUpdateResponse\x12\x0e\n\x06status\x18\x01 \x01(\t\"(\n\x15GetListOfFilesRequest\x12\x0f\n\x07nodeips\x18\x01 \x03(\t\"+\n\x16GetListOfFilesResponse\x12\x11\n\tfilenames\x18\x01 \x03(\t\"\x17\n\x15GetListOfNodesRequest\")\n\x16GetListOfNodesResponse\x12\x0f\n\x07nodeips\x18\x01 \x03(\t*\"\n\x06Status\x12\x0b\n\x07SUCCESS\x10\x00\x12\x0b\n\x07\x46\x41ILURE\x10\x01\x32\xbe\x05\n\x0bReplication\x12N\n\rNewNodeUpdate\x12\x1c.stream.NewNodeUpdateRequest\x1a\x1d.stream.NewNodeUpdateResponse\"\x00\x12]\n\x12GetNodeForDownload\x12!.stream.GetNodeForDownloadRequest\x1a\".stream.GetNodeForDownloadResponse\"\x00\x12W\n\x10GetNodeForUpload\x12\x1f.stream.GetNodeForUploadRequest\x1a .stream.GetNodeForUploadResponse\"\x00\x12Q\n\x0eNodeDownUpdate\x12\x1d.stream.NodeDownUpdateRequest\x1a\x1e.stream.NodeDownUpdateResponse\"\x00\x12Q\n\x0eGetListOfNodes\x12\x1d.stream.GetListOfNodesRequest\x1a\x1e.stream.GetListOfNodesResponse\"\x00\x12J\n\x18GetNodeIpsForReplication\x12\x16.stream.NodeIpsRequest\x1a\x14.stream.NodeIpsReply\"\x00\x12\x62\n\x17UpdateReplicationStatus\x12!.stream.ReplicationDetailsRequest\x1a\".stream.ReplicationDetailsResponse\"\x00\x12Q\n\x0eGetListOfFiles\x12\x1d.stream.GetListOfFilesRequest\x1a\x1e.stream.GetListOfFilesResponse\"\x00\x42\x15\n\x11org.master.protosP\x01\x62\x06proto3')
 
 _STATUS = DESCRIPTOR.enum_types_by_name['Status']
 Status = enum_type_wrapper.EnumTypeWrapper(_STATUS)
@@ -28,12 +28,14 @@ _NODEIPSREPLY = DESCRIPTOR.message_types_by_name['NodeIpsReply']
 _REPLICATIONDETAILSREQUEST = DESCRIPTOR.message_types_by_name['ReplicationDetailsRequest']
 _REPLICATIONDETAILSRESPONSE = DESCRIPTOR.message_types_by_name['ReplicationDetailsResponse']
 _NEWNODEUPDATEREQUEST = DESCRIPTOR.message_types_by_name['NewNodeUpdateRequest']
+_NEWNODEUPDATERESPONSE = DESCRIPTOR.message_types_by_name['NewNodeUpdateResponse']
 _STATUSRESPONSE = DESCRIPTOR.message_types_by_name['StatusResponse']
 _GETNODEFORDOWNLOADREQUEST = DESCRIPTOR.message_types_by_name['GetNodeForDownloadRequest']
 _GETNODEFORDOWNLOADRESPONSE = DESCRIPTOR.message_types_by_name['GetNodeForDownloadResponse']
 _GETNODEFORUPLOADREQUEST = DESCRIPTOR.message_types_by_name['GetNodeForUploadRequest']
 _GETNODEFORUPLOADRESPONSE = DESCRIPTOR.message_types_by_name['GetNodeForUploadResponse']
 _NODEDOWNUPDATEREQUEST = DESCRIPTOR.message_types_by_name['NodeDownUpdateRequest']
+_NODEDOWNUPDATERESPONSE = DESCRIPTOR.message_types_by_name['NodeDownUpdateResponse']
 _GETLISTOFFILESREQUEST = DESCRIPTOR.message_types_by_name['GetListOfFilesRequest']
 _GETLISTOFFILESRESPONSE = DESCRIPTOR.message_types_by_name['GetListOfFilesResponse']
 _GETLISTOFNODESREQUEST = DESCRIPTOR.message_types_by_name['GetListOfNodesRequest']
@@ -72,6 +74,13 @@ NewNodeUpdateRequest = _reflection.GeneratedProtocolMessageType('NewNodeUpdateRe
   # @@protoc_insertion_point(class_scope:stream.NewNodeUpdateRequest)
   })
 _sym_db.RegisterMessage(NewNodeUpdateRequest)
+
+NewNodeUpdateResponse = _reflection.GeneratedProtocolMessageType('NewNodeUpdateResponse', (_message.Message,), {
+  'DESCRIPTOR' : _NEWNODEUPDATERESPONSE,
+  '__module__' : 'master_comm_pb2'
+  # @@protoc_insertion_point(class_scope:stream.NewNodeUpdateResponse)
+  })
+_sym_db.RegisterMessage(NewNodeUpdateResponse)
 
 StatusResponse = _reflection.GeneratedProtocolMessageType('StatusResponse', (_message.Message,), {
   'DESCRIPTOR' : _STATUSRESPONSE,
@@ -115,6 +124,13 @@ NodeDownUpdateRequest = _reflection.GeneratedProtocolMessageType('NodeDownUpdate
   })
 _sym_db.RegisterMessage(NodeDownUpdateRequest)
 
+NodeDownUpdateResponse = _reflection.GeneratedProtocolMessageType('NodeDownUpdateResponse', (_message.Message,), {
+  'DESCRIPTOR' : _NODEDOWNUPDATERESPONSE,
+  '__module__' : 'master_comm_pb2'
+  # @@protoc_insertion_point(class_scope:stream.NodeDownUpdateResponse)
+  })
+_sym_db.RegisterMessage(NodeDownUpdateResponse)
+
 GetListOfFilesRequest = _reflection.GeneratedProtocolMessageType('GetListOfFilesRequest', (_message.Message,), {
   'DESCRIPTOR' : _GETLISTOFFILESREQUEST,
   '__module__' : 'master_comm_pb2'
@@ -148,8 +164,8 @@ if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'\n\021org.master.protosP\001'
-  _STATUS._serialized_start=713
-  _STATUS._serialized_end=747
+  _STATUS._serialized_start=796
+  _STATUS._serialized_end=830
   _NODEIPSREQUEST._serialized_start=29
   _NODEIPSREQUEST._serialized_end=63
   _NODEIPSREPLY._serialized_start=65
@@ -160,26 +176,30 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _REPLICATIONDETAILSRESPONSE._serialized_end=222
   _NEWNODEUPDATEREQUEST._serialized_start=224
   _NEWNODEUPDATEREQUEST._serialized_end=265
-  _STATUSRESPONSE._serialized_start=267
-  _STATUSRESPONSE._serialized_end=315
-  _GETNODEFORDOWNLOADREQUEST._serialized_start=317
-  _GETNODEFORDOWNLOADREQUEST._serialized_end=362
-  _GETNODEFORDOWNLOADRESPONSE._serialized_start=364
-  _GETNODEFORDOWNLOADRESPONSE._serialized_end=408
-  _GETNODEFORUPLOADREQUEST._serialized_start=410
-  _GETNODEFORUPLOADREQUEST._serialized_end=471
-  _GETNODEFORUPLOADRESPONSE._serialized_start=473
-  _GETNODEFORUPLOADRESPONSE._serialized_end=515
-  _NODEDOWNUPDATEREQUEST._serialized_start=517
-  _NODEDOWNUPDATEREQUEST._serialized_end=556
-  _GETLISTOFFILESREQUEST._serialized_start=558
-  _GETLISTOFFILESREQUEST._serialized_end=598
-  _GETLISTOFFILESRESPONSE._serialized_start=600
-  _GETLISTOFFILESRESPONSE._serialized_end=643
-  _GETLISTOFNODESREQUEST._serialized_start=645
-  _GETLISTOFNODESREQUEST._serialized_end=668
-  _GETLISTOFNODESRESPONSE._serialized_start=670
-  _GETLISTOFNODESRESPONSE._serialized_end=711
-  _REPLICATION._serialized_start=750
-  _REPLICATION._serialized_end=1437
+  _NEWNODEUPDATERESPONSE._serialized_start=267
+  _NEWNODEUPDATERESPONSE._serialized_end=306
+  _STATUSRESPONSE._serialized_start=308
+  _STATUSRESPONSE._serialized_end=356
+  _GETNODEFORDOWNLOADREQUEST._serialized_start=358
+  _GETNODEFORDOWNLOADREQUEST._serialized_end=403
+  _GETNODEFORDOWNLOADRESPONSE._serialized_start=405
+  _GETNODEFORDOWNLOADRESPONSE._serialized_end=449
+  _GETNODEFORUPLOADREQUEST._serialized_start=451
+  _GETNODEFORUPLOADREQUEST._serialized_end=512
+  _GETNODEFORUPLOADRESPONSE._serialized_start=514
+  _GETNODEFORUPLOADRESPONSE._serialized_end=556
+  _NODEDOWNUPDATEREQUEST._serialized_start=558
+  _NODEDOWNUPDATEREQUEST._serialized_end=597
+  _NODEDOWNUPDATERESPONSE._serialized_start=599
+  _NODEDOWNUPDATERESPONSE._serialized_end=639
+  _GETLISTOFFILESREQUEST._serialized_start=641
+  _GETLISTOFFILESREQUEST._serialized_end=681
+  _GETLISTOFFILESRESPONSE._serialized_start=683
+  _GETLISTOFFILESRESPONSE._serialized_end=726
+  _GETLISTOFNODESREQUEST._serialized_start=728
+  _GETLISTOFNODESREQUEST._serialized_end=751
+  _GETLISTOFNODESRESPONSE._serialized_start=753
+  _GETLISTOFNODESRESPONSE._serialized_end=794
+  _REPLICATION._serialized_start=833
+  _REPLICATION._serialized_end=1535
 # @@protoc_insertion_point(module_scope)
