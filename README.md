@@ -12,3 +12,14 @@ Master Node implementation for Space Opera in Python
 
 ## Team Members
 - Anupriya, Arpitha, Rounak, Sandhya
+
+
+Replicating Node:
+
+<img width="1601" alt="repl" src="https://user-images.githubusercontent.com/89316938/168875021-3aef222f-249f-49c7-b351-2606a558cc63.png">
+
+Getting List of Nodes:
+
+<img width="1652" alt="list" src="https://user-images.githubusercontent.com/89316938/168875027-cd3e40b4-fc3a-4f01-b68f-70b677c34eb6.png">
+
+
