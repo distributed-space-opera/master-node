@@ -116,9 +116,19 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
                 replica_nodes = redis_client.sdiff(NETWORK_NODES, NETWORK_DATA_FILE % file)
                 replica_node = random.choice(list(replica_nodes))
                 # TODO: Send message to node to replicate file to replica_node
+                
+               
+        with grpc.insecure_channel('localhost:50051') as channel:
+         stub = helloworld_pb2_grpc.GreeterStub(channel)
+         response = stub.SayHello(helloworld_pb2.HelloRequest(name='you'))
+         print("Greeter client received: " + response.message)
+         response = stub.SayHelloAgain(helloworld_pb2.HelloRequest(name='you'))
+         print("Greeter client received: " + response.message)
+        
                 logging.info(f"Replicating file {file} to {replica_node}")
                 # TODO
                 # Get a node that has the required file
+                
                 # Send message to node to replicate file to replica_node
 
             # Remove node from network
