@@ -49,10 +49,10 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
         if request.newnodeip:
             # Save new node to Redis DB
             redis_client.sadd(NETWORK_NODES, request.newnodeip)
-            return master_comm_pb2.StatusResponse(status = master_comm_pb2.Status.Value("SUCCESS"))
+            return master_comm_pb2.NewNodeUpdateResponse(status = "SUCCESS")
         else:
             logging.error("NewNodeUpdate invoked with empty request")
-            return master_comm_pb2.StatusResponse(status = master_comm_pb2.Status.Value("FAILURE"))
+            return master_comm_pb2.NewNodeUpdateResponse(status = "FAILURE")
 
 
     def GetNodeForDownload(self, request, context):
@@ -123,10 +123,10 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
 
             # Remove node from network
             redis_client.srem(NETWORK_NODES, request.nodeip)
-            return master_comm_pb2.StatusResponse(status = master_comm_pb2.Status.Value("SUCCESS"))            
+            return master_comm_pb2.NodeDownUpdateResponse(status = "SUCCESS")
         else:
             logging.error("NodeDownUpdate invoked with empty request")
-            return master_comm_pb2.StatusResponse(status = master_comm_pb2.Status.Value("FAILURE"))
+            return master_comm_pb2.NodeDownUpdateResponse(status = "FAILURE")
 
 
     def GetListOfNodes(self, request, context):
