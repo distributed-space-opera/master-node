@@ -117,16 +117,14 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
                 replica_node = random.choice(list(replica_nodes))
                 # TODO: Send message to node to replicate file to replica_node
                 
-               
-        with grpc.insecure_channel('localhost:50051') as channel:
-         stub = helloworld_pb2_grpc.GreeterStub(channel)
-         response = stub.SayHello(helloworld_pb2.HelloRequest(name='you'))
-         print("Greeter client received: " + response.message)
-         response = stub.SayHelloAgain(helloworld_pb2.HelloRequest(name='you'))
-         print("Greeter client received: " + response.message)
-        
+                # example 
+                #response = stub.SayHello(helloworld_pb2.HelloRequest(name='you'))
+                #print("Greeter client received: " + response.message)
+                
+                replicateresponse = stub.ReplicateFile(node_comm_pb2.ReplicateFileRequest(filename=file, nodeips=[replica_node]))
                 logging.info(f"Replicating file {file} to {replica_node}")
-                # TODO
+               
+                 # TODO
                 # Get a node that has the required file
                 
                 # Send message to node to replicate file to replica_node
