@@ -8,6 +8,8 @@ from concurrent import futures
 import grpc
 import master_comm_pb2
 import master_comm_pb2_grpc
+import node_comm_pb2
+import node_comm_pb2_grpc
 import random
 import redis
 
@@ -115,11 +117,22 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
             for file in files:
                 replica_nodes = redis_client.sdiff(NETWORK_NODES, NETWORK_DATA_FILE % file)
                 replica_node = random.choice(list(replica_nodes))
-                # TODO: Send message to node to replicate file to replica_node
-                logging.info(f"Replicating file {file} to {replica_node}")
-                # TODO
-                # Get a node that has the required file
+                
                 # Send message to node to replicate file to replica_node
+                logging.info(f"Replicating file {file} to {replica_node}")
+                nodes = redis_client.srandmember(NETWORK_DATA_FILE % file)
+                # Get a node that has the required file and isn't the node that is down
+                for node in nodes:
+                    if node != request.nodeip:
+                        logging.info(f"Sending request to {node} to replicate file {file}")
+                        replicate_response = None
+                        with grpc.insecure_channel(node) as node_channel:
+                            stub = node_comm_pb2_grpc.NodeReplicationStub(node_channel)
+                            replicate_response = stub.ReplicateFile(node_comm_pb2.ReplicateFileRequest(filename=file, nodeips=[replica_node]))
+                            logging.info(f"Response from ReplicateFile request: {replicate_response}")
+                        
+                        if replicate_response != None and replicate_response.status == "SUCCESS":
+                            break
 
             # Remove node from network
             redis_client.srem(NETWORK_NODES, request.nodeip)
