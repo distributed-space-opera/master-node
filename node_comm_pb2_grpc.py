@@ -14,6 +14,11 @@ class NodeReplicationStub(object):
         Args:
             channel: A grpc.Channel.
         """
+        self.ReplicateFile = channel.unary_unary(
+                '/stream.NodeReplication/ReplicateFile',
+                request_serializer=node__comm__pb2.ReplicateFileRequest.SerializeToString,
+                response_deserializer=node__comm__pb2.ReplicateFileResponse.FromString,
+                )
         self.CreateReplica = channel.stream_unary(
                 '/stream.NodeReplication/CreateReplica',
                 request_serializer=node__comm__pb2.CreateReplicaRequest.SerializeToString,
@@ -24,6 +29,12 @@ class NodeReplicationStub(object):
 class NodeReplicationServicer(object):
     """Missing associated documentation comment in .proto file."""
 
+    def ReplicateFile(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def CreateReplica(self, request_iterator, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -33,6 +44,11 @@ class NodeReplicationServicer(object):
 
 def add_NodeReplicationServicer_to_server(servicer, server):
     rpc_method_handlers = {
+            'ReplicateFile': grpc.unary_unary_rpc_method_handler(
+                    servicer.ReplicateFile,
+                    request_deserializer=node__comm__pb2.ReplicateFileRequest.FromString,
+                    response_serializer=node__comm__pb2.ReplicateFileResponse.SerializeToString,
+            ),
             'CreateReplica': grpc.stream_unary_rpc_method_handler(
                     servicer.CreateReplica,
                     request_deserializer=node__comm__pb2.CreateReplicaRequest.FromString,
@@ -47,6 +63,23 @@ def add_NodeReplicationServicer_to_server(servicer, server):
  # This class is part of an EXPERIMENTAL API.
 class NodeReplication(object):
     """Missing associated documentation comment in .proto file."""
+
+    @staticmethod
+    def ReplicateFile(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/stream.NodeReplication/ReplicateFile',
+            node__comm__pb2.ReplicateFileRequest.SerializeToString,
+            node__comm__pb2.ReplicateFileResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
     def CreateReplica(request_iterator,

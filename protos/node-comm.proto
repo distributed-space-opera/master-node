@@ -7,8 +7,18 @@ option java_package = "org.node.protos";
 package stream;
 
 service NodeReplication {
-
+  rpc ReplicateFile(ReplicateFileRequest) returns (ReplicateFileResponse) {}  // Message from Master Node to replicate given file in case of other node failure
   rpc CreateReplica (stream CreateReplicaRequest) returns (CreateReplicaReply) {}
+}
+
+message ReplicateFileRequest {
+  string filename = 1;
+  repeated string nodeips = 2;
+}
+
+// status will contain either "SUCCESS" or "FAILURE"
+message ReplicateFileResponse {
+  string status = 1;
 }
 
 // The request message containing the user's name.
