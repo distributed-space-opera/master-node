@@ -228,7 +228,8 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     master_comm_pb2_grpc.add_ReplicationServicer_to_server(MasterComm(), server)
-    server.add_insecure_port('[::]:50051')
+    # server.add_insecure_port('[::]:50051')
+    server.add_insecure_port('[::]:6090')
     server.start()
     server.wait_for_termination()
 
