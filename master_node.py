@@ -14,9 +14,12 @@ import random
 import redis
 
 # Redis configuration
-REDIS_HOST = "localhost"
+# REDIS_HOST = "localhost"
+# REDIS_PORT = 6379
+# REDIS_PASSWORD = ""
+REDIS_HOST = "a5c2cf3b49b5646829aa1b82ee0d2611-1520476928.us-west-1.elb.amazonaws.com"
 REDIS_PORT = 6379
-REDIS_PASSWORD = ""
+REDIS_PASSWORD = "sdfkj!$n7jh1&%"
 
 # Redis keys
 NETWORK_NODES = "network:nodes"
