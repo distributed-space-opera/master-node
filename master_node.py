@@ -54,6 +54,7 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
         if request.newnodeip:
             # Save new node to Redis DB
             redis_client.sadd(NETWORK_NODES, request.newnodeip)
+            logging.info(f"New node {request.newnodeip} added to network")
             return master_comm_pb2.NewNodeUpdateResponse(status = "SUCCESS")
         else:
             logging.error("NewNodeUpdate invoked with empty request")
@@ -71,8 +72,10 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
             if nodes:
                 # Return random node that contains the file
                 node = random.choice(list(nodes))
+                logging.info(f"Returning node {node} for file {request.filename}")
                 return master_comm_pb2.GetNodeForDownloadResponse(nodeip=node)
             else:
+                logging.info("Returning empty nodeip")
                 return master_comm_pb2.GetNodeForDownloadResponse()
         else:
             logging.error("GetNodeForDownload invoked with empty request")
@@ -101,6 +104,7 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
             redis_client.sadd(NETWORK_NODE_DATA % node_ip, request.filename)
             redis_client.sadd(NETWORK_DATA_FILE % request.filename, node_ip)
 
+            logging.info(f"Returning node {node_ip} for file upload of {request.filename}")
             return master_comm_pb2.GetNodeForUploadResponse(nodeip = node_ip)
         else:
             logging.error("GetNodeForUpload invoked with empty request")
@@ -119,7 +123,15 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
             files = redis_client.smembers(NETWORK_NODE_DATA % request.nodeip)
             for file in files:
                 replica_nodes = redis_client.sdiff(NETWORK_NODES, NETWORK_DATA_FILE % file)
-                replica_node = random.choice(list(replica_nodes))
+                replica_node = None
+                if replica_nodes:
+                    replica_node = random.choice(list(replica_nodes))
+                else:
+                    logging.error(f"No nodes available for replicating file {file}")
+                    # Remove node from network
+                    redis_client.srem(NETWORK_NODES, request.nodeip)
+                    logging.info(f"Node {request.nodeip} removed from network")
+                    return master_comm_pb2.NodeDownUpdateResponse(status = "SUCCESS")
                 
                 # Send message to node to replicate file to replica_node
                 logging.info(f"Replicating file {file} to {replica_node}")
@@ -139,6 +151,7 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
 
             # Remove node from network
             redis_client.srem(NETWORK_NODES, request.nodeip)
+            logging.info(f"Node {request.nodeip} removed from network")
             return master_comm_pb2.NodeDownUpdateResponse(status = "SUCCESS")
         else:
             logging.error("NodeDownUpdate invoked with empty request")
@@ -152,6 +165,7 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
         """
         logging.info(f"GetListOfNodes invoked with request: {request}")
         nodes = redis_client.smembers(NETWORK_NODES)
+        logging.info(f"Returning list of nodes: {nodes}")
         return master_comm_pb2.GetListOfNodesResponse(nodeips=list(nodes))
 
 
@@ -183,6 +197,7 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
                     break
             
             # Return list of nodes to replicate
+            logging.info(f"Returning list of nodes to replicate: {replication_nodes}")
             return master_comm_pb2.NodeIpsReply(nodeips = replication_nodes)
         else:
             logging.error("GetNodeIpsForReplication invoked with empty request")
@@ -221,10 +236,12 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
                 node_files = redis_client.smembers(NETWORK_NODE_DATA % node)
                 files.update(node_files)
 
+            logging.info(f"Returning list of files: {files} for nodes: {request.nodeips}")
             return master_comm_pb2.GetListOfFilesResponse(files=list(files))
         else:
             # Return list of all files on the network
             files = redis_client.smembers(NETWORK_DATA)
+            logging.info(f"Returning list of all files on network: {files}")
             return master_comm_pb2.GetListOfFilesResponse(filenames = list(files))
 
 
