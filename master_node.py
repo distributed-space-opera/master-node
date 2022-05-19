@@ -57,7 +57,7 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
             logging.info(f"New node {request.newnodeip} added to network")
             return master_comm_pb2.NewNodeUpdateResponse(status = "SUCCESS")
         else:
-            logging.error("NewNodeUpdate invoked with empty request")
+            logging.info("[ERROR]: NewNodeUpdate invoked with empty request")
             return master_comm_pb2.NewNodeUpdateResponse(status = "FAILURE")
 
 
@@ -78,7 +78,7 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
                 logging.info("Returning empty nodeip")
                 return master_comm_pb2.GetNodeForDownloadResponse()
         else:
-            logging.error("GetNodeForDownload invoked with empty request")
+            logging.info("[ERROR]: GetNodeForDownload invoked with empty request")
             return master_comm_pb2.GetNodeForDownloadResponse()
 
 
@@ -94,6 +94,10 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
             for node in redis_client.smembers(NETWORK_NODES):
                 nodes[node] = len(redis_client.smembers(NETWORK_NODE_DATA % node))
 
+            if len(nodes) == 0:
+                logging.info(f"No nodes available on network to upload file {request.filename}")
+                return master_comm_pb2.GetNodeForUploadResponse(nodeip = "")
+
             # Sort nodes by number of files stored on them
             sorted_nodes = sorted(nodes.items(), key=lambda x: x[1])
 
@@ -107,7 +111,7 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
             logging.info(f"Returning node {node_ip} for file upload of {request.filename}")
             return master_comm_pb2.GetNodeForUploadResponse(nodeip = node_ip)
         else:
-            logging.error("GetNodeForUpload invoked with empty request")
+            logging.info("[ERROR]: GetNodeForUpload invoked with empty request")
             return master_comm_pb2.GetNodeForUploadResponse()
 
 
@@ -127,7 +131,7 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
                 if replica_nodes:
                     replica_node = random.choice(list(replica_nodes))
                 else:
-                    logging.error(f"No nodes available for replicating file {file}")
+                    logging.info(f"[ERROR]: No nodes available for replicating file {file}")
                     # Remove node from network
                     redis_client.srem(NETWORK_NODES, request.nodeip)
                     logging.info(f"Node {request.nodeip} removed from network")
@@ -135,26 +139,33 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
                 
                 # Send message to node to replicate file to replica_node
                 logging.info(f"Replicating file {file} to {replica_node}")
-                nodes = redis_client.srandmember(NETWORK_DATA_FILE % file)
+                nodes = redis_client.smembers(NETWORK_DATA_FILE % file)
                 # Get a node that has the required file and isn't the node that is down
-                for node in nodes:
-                    if node != request.nodeip:
-                        logging.info(f"Sending request to {node} to replicate file {file}")
-                        replicate_response = None
-                        with grpc.insecure_channel(node) as node_channel:
-                            stub = node_comm_pb2_grpc.NodeReplicationStub(node_channel)
-                            replicate_response = stub.ReplicateFile(node_comm_pb2.ReplicateFileRequest(filename=file, nodeips=[replica_node]))
-                            logging.info(f"Response from ReplicateFile request: {replicate_response}")
-                        
-                        if replicate_response != None and replicate_response.status == "SUCCESS":
-                            break
+                # logging.info("NODES THAT WE GOT ARE")
+                # logging.info(nodes)
+                # logging.info(request.nodeip)
+                if len(nodes) > 1:
+                    for node in nodes:
+                        if node != request.nodeip:
+                            logging.info(f"Sending request to {node} to replicate file {file}")
+                            replicate_response = None
+                            with grpc.insecure_channel(f"{node}:6080") as node_channel:
+                                stub = node_comm_pb2_grpc.NodeReplicationStub(node_channel)
+                                replicate_response = stub.ReplicateFile(node_comm_pb2.ReplicateFileRequest(filename=file, nodeips=[replica_node]))
+                                logging.info(f"Response from ReplicateFile request: {replicate_response}")
+                            
+                            if replicate_response != None and replicate_response.status == "SUCCESS":
+                                break
+
+                else:
+                    logging.info("[ERROR]: We can't replicate to node...")
 
             # Remove node from network
             redis_client.srem(NETWORK_NODES, request.nodeip)
             logging.info(f"Node {request.nodeip} removed from network")
             return master_comm_pb2.NodeDownUpdateResponse(status = "SUCCESS")
         else:
-            logging.error("NodeDownUpdate invoked with empty request")
+            logging.info("[ERROR]: NodeDownUpdate invoked with empty request")
             return master_comm_pb2.NodeDownUpdateResponse(status = "FAILURE")
 
 
@@ -200,7 +211,7 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
             logging.info(f"Returning list of nodes to replicate: {replication_nodes}")
             return master_comm_pb2.NodeIpsReply(nodeips = replication_nodes)
         else:
-            logging.error("GetNodeIpsForReplication invoked with empty request")
+            logging.info("[ERROR]: GetNodeIpsForReplication invoked with empty request")
             return master_comm_pb2.NodeIpsReply()
 
 
@@ -218,7 +229,7 @@ class MasterComm(master_comm_pb2_grpc.ReplicationServicer):
                 redis_client.sadd(NETWORK_DATA_FILE % request.filename, node)
             return master_comm_pb2.StatusResponse(status = master_comm_pb2.Status.Value("SUCCESS"))
         else:
-            logging.error("UpdateReplicationStatus invoked with empty request")
+            logging.info("[ERROR]: UpdateReplicationStatus invoked with empty request")
             return master_comm_pb2.StatusResponse(status = master_comm_pb2.Status.Value("FAILURE"))
 
 
@@ -262,7 +273,7 @@ def setup_redis():
     try:
         redis_client = redis.Redis(host=FLAGS.redis_host, port=FLAGS.redis_port, password=FLAGS.redis_password, decode_responses=True)
     except Exception as e:
-        logging.error("Error while connecting to redis: %s", e)
+        logging.info("[ERROR]: Error while connecting to redis: %s", e)
         exit(1)
 
 
